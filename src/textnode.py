@@ -1,5 +1,7 @@
 from enum import Enum
 
+from htmlnode import HtmlNode, LeafNode
+
 class TextType(Enum):
     PLAIN_TEXT = "text"
     BOLD_TEXT = "**Bold text**"
@@ -25,3 +27,18 @@ class TextNode:
 
     def __repr__(self):
         return f"TextNode({self.text!r}, {self.text_type.value!r}, {self.url!r})"
+
+    def text_node_to_html_node(self):
+        if self.text_type == TextType.PLAIN_TEXT :
+            return LeafNode(None, self.text)
+        if self.text_type == TextType.BOLD_TEXT :
+            return LeafNode("b", self.text)
+        if self.text_type == TextType.ITALIC_TEXT :
+            return LeafNode("i", self.text)
+        if self.text_type == TextType.CODE_TEXT :
+            return LeafNode("code", self.text)
+        if self.text_type == TextType.LINKS :
+            return LeafNode("a", self.text, {"href": self.url})
+        if self.text_type == TextType.IMAGES :
+            return LeafNode("img", "", {"src": self.url, "alt": self.text})
+        raise ValueError(f"Unsupported text type: {self.text_type}")
