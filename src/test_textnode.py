@@ -1,7 +1,7 @@
 import unittest
 
 from textnode import TextNode, TextType
-
+from splitnodes import split_nodes_delimiter
 
 class TestTextNode(unittest.TestCase):
     # ===== TextNode Equality Tests =====
@@ -102,3 +102,74 @@ class TestTextNode(unittest.TestCase):
         with self.assertRaises(ValueError) as context:
             node.text_node_to_html_node()
         self.assertIn("Unsupported text type", str(context.exception))
+
+    # ===== Split Nodes Delimiter Tests =====
+    def test_split_nodes_delimiter_code(self):
+        # Test splitting code blocks with backticks
+        node = TextNode("This is text with a `code block` word", TextType.PLAIN_TEXT)
+        new_nodes = split_nodes_delimiter([node], "`", TextType.CODE_TEXT)
+
+        expected = [
+            TextNode("This is text with a ", TextType.PLAIN_TEXT),
+            TextNode("code block", TextType.CODE_TEXT),
+            TextNode(" word", TextType.PLAIN_TEXT)
+        ]
+
+        self.assertEqual(len(new_nodes), 3)
+        self.assertEqual(new_nodes[0].text, "This is text with a ")
+        self.assertEqual(new_nodes[0].text_type, TextType.PLAIN_TEXT)
+        self.assertEqual(new_nodes[1].text, "code block")
+        self.assertEqual(new_nodes[1].text_type, TextType.CODE_TEXT)
+        self.assertEqual(new_nodes[2].text, " word")
+        self.assertEqual(new_nodes[2].text_type, TextType.PLAIN_TEXT)
+
+    def test_split_nodes_delimiter_bold(self):
+        # Test splitting bold text with **
+        node = TextNode("This is **bold** text", TextType.PLAIN_TEXT)
+        new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD_TEXT)
+
+        self.assertEqual(len(new_nodes), 3)
+        self.assertEqual(new_nodes[0].text, "This is ")
+        self.assertEqual(new_nodes[0].text_type, TextType.PLAIN_TEXT)
+        self.assertEqual(new_nodes[1].text, "bold")
+        self.assertEqual(new_nodes[1].text_type, TextType.BOLD_TEXT)
+        self.assertEqual(new_nodes[2].text, " text")
+        self.assertEqual(new_nodes[2].text_type, TextType.PLAIN_TEXT)
+
+    def test_split_nodes_delimiter_italic(self):
+        # Test splitting italic text with _
+        node = TextNode("This is _italic_ text", TextType.PLAIN_TEXT)
+        new_nodes = split_nodes_delimiter([node], "_", TextType.ITALIC_TEXT)
+
+        self.assertEqual(len(new_nodes), 3)
+        self.assertEqual(new_nodes[0].text, "This is ")
+        self.assertEqual(new_nodes[0].text_type, TextType.PLAIN_TEXT)
+        self.assertEqual(new_nodes[1].text, "italic")
+        self.assertEqual(new_nodes[1].text_type, TextType.ITALIC_TEXT)
+        self.assertEqual(new_nodes[2].text, " text")
+        self.assertEqual(new_nodes[2].text_type, TextType.PLAIN_TEXT)
+
+    def test_split_nodes_delimiter_no_delimiter(self):
+        # Test node with no delimiter - should return original
+        node = TextNode("This is just plain text", TextType.PLAIN_TEXT)
+        new_nodes = split_nodes_delimiter([node], "`", TextType.CODE_TEXT)
+
+        self.assertEqual(len(new_nodes), 1)
+        self.assertEqual(new_nodes[0].text, "This is just plain text")
+        self.assertEqual(new_nodes[0].text_type, TextType.PLAIN_TEXT)
+
+    def test_split_nodes_delimiter_non_text_node(self):
+        # Test that non-plain-text nodes are left unchanged
+        node = TextNode("Already bold", TextType.BOLD_TEXT)
+        new_nodes = split_nodes_delimiter([node], "`", TextType.CODE_TEXT)
+
+        self.assertEqual(len(new_nodes), 1)
+        self.assertEqual(new_nodes[0].text, "Already bold")
+        self.assertEqual(new_nodes[0].text_type, TextType.BOLD_TEXT)
+
+    def test_split_nodes_delimiter_unmatched_raises_error(self):
+        # Test that unmatched delimiters raise ValueError
+        node = TextNode("This has unmatched `code", TextType.PLAIN_TEXT)
+        with self.assertRaises(ValueError) as context:
+            split_nodes_delimiter([node], "`", TextType.CODE_TEXT)
+        self.assertIn("unmatched", str(context.exception))
