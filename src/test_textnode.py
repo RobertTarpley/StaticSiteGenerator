@@ -1,6 +1,6 @@
 import unittest
 
-from textnode import TextNode, TextType
+from textnode import TextNode, TextType, extract_markdown_images, extract_markdown_links
 from splitnodes import split_nodes_delimiter
 
 class TestTextNode(unittest.TestCase):
@@ -173,3 +173,91 @@ class TestTextNode(unittest.TestCase):
         with self.assertRaises(ValueError) as context:
             split_nodes_delimiter([node], "`", TextType.CODE_TEXT)
         self.assertIn("unmatched", str(context.exception))
+
+    # ===== Markdown Extraction Tests =====
+    def test_extract_markdown_images_single(self):
+        # Test extracting a single image
+        text = "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)"
+        matches = extract_markdown_images(text)
+        expected = [("image", "https://i.imgur.com/zjjcJKZ.png")]
+        self.assertEqual(matches, expected)
+
+    def test_extract_markdown_images_multiple(self):
+        # Test extracting multiple images
+        text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+        matches = extract_markdown_images(text)
+        expected = [
+            ("rick roll", "https://i.imgur.com/aKaOqIh.gif"),
+            ("obi wan", "https://i.imgur.com/fJRm4Vk.jpeg")
+        ]
+        self.assertEqual(matches, expected)
+
+    def test_extract_markdown_images_none(self):
+        # Test text with no images
+        text = "This is just plain text with no images"
+        matches = extract_markdown_images(text)
+        self.assertEqual(matches, [])
+
+    def test_extract_markdown_images_empty_alt(self):
+        # Test image with empty alt text
+        text = "Image with empty alt ![](https://example.com/image.jpg)"
+        matches = extract_markdown_images(text)
+        expected = [("", "https://example.com/image.jpg")]
+        self.assertEqual(matches, expected)
+
+    def test_extract_markdown_images_special_chars(self):
+        # Test image with special characters in alt text
+        text = "Special chars ![image with spaces & symbols!](https://example.com/img.png)"
+        matches = extract_markdown_images(text)
+        expected = [("image with spaces & symbols!", "https://example.com/img.png")]
+        self.assertEqual(matches, expected)
+
+    def test_extract_markdown_links_single(self):
+        # Test extracting a single link
+        text = "This is text with a link [to boot dev](https://www.boot.dev)"
+        matches = extract_markdown_links(text)
+        expected = [("to boot dev", "https://www.boot.dev")]
+        self.assertEqual(matches, expected)
+
+    def test_extract_markdown_links_multiple(self):
+        # Test extracting multiple links
+        text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
+        matches = extract_markdown_links(text)
+        expected = [
+            ("to boot dev", "https://www.boot.dev"),
+            ("to youtube", "https://www.youtube.com/@bootdotdev")
+        ]
+        self.assertEqual(matches, expected)
+
+    def test_extract_markdown_links_none(self):
+        # Test text with no links
+        text = "This is just plain text with no links"
+        matches = extract_markdown_links(text)
+        self.assertEqual(matches, [])
+
+    def test_extract_markdown_links_empty_text(self):
+        # Test link with empty anchor text
+        text = "Empty link text [](https://example.com)"
+        matches = extract_markdown_links(text)
+        expected = [("", "https://example.com")]
+        self.assertEqual(matches, expected)
+
+    def test_extract_markdown_links_special_chars(self):
+        # Test link with special characters in anchor text
+        text = "Special chars [link with spaces & symbols!](https://example.com)"
+        matches = extract_markdown_links(text)
+        expected = [("link with spaces & symbols!", "https://example.com")]
+        self.assertEqual(matches, expected)
+
+    def test_extract_markdown_mixed_images_and_links(self):
+        # Test text with both images and links (functions should ignore the other type)
+        text = "Text with ![image](https://example.com/img.jpg) and [link](https://example.com)"
+        
+        image_matches = extract_markdown_images(text)
+        link_matches = extract_markdown_links(text)
+        
+        expected_images = [("image", "https://example.com/img.jpg")]
+        expected_links = [("link", "https://example.com")]
+        
+        self.assertEqual(image_matches, expected_images)
+        self.assertEqual(link_matches, expected_links)

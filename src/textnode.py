@@ -1,6 +1,22 @@
 from enum import Enum
+from htmlnode import LeafNode
+import re
 
-from htmlnode import HtmlNode, LeafNode
+
+def extract_markdown_images(text):
+    """Extracts images from markdown text and returns list of (alt_text, url) tuples."""
+    # Pattern matches ![alt text](url)
+    pattern = r'!\[([^\[\]]*?)\]\(([^\(\)]*?)\)'
+    matches = re.findall(pattern, text)
+    return matches
+
+def extract_markdown_links(text):
+    """extracts markdown links instead of images. It should return tuples of anchor text and URLs"""
+    # Pattern matches [text](url) but NOT ![text](url)
+    pattern = r'(?<!\!)\[([^\[\]]*?)\]\(([^\(\)]*?)\)'
+    matches = re.findall(pattern, text)
+    return matches
+
 
 class TextType(Enum):
     PLAIN_TEXT = "text"
