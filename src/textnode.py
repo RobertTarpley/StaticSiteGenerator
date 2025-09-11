@@ -17,6 +17,40 @@ def extract_markdown_links(text):
     matches = re.findall(pattern, text)
     return matches
 
+def text_to_textnodes(text):
+    """Converts markdown text into a list of TextNode objects by applying all splitting functions."""
+    # Import here to avoid circular imports
+    from splitnodes import split_nodes_delimiter, split_nodes_image, split_nodes_link
+
+    # Start with the input text as a single plain text node
+    nodes = [TextNode(text, TextType.PLAIN_TEXT)]
+
+    # Apply each splitting function in sequence
+    # Order matters: images first, then links, then inline formatting
+    nodes = split_nodes_image(nodes)
+    nodes = split_nodes_link(nodes)
+    nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD_TEXT)
+    nodes = split_nodes_delimiter(nodes, "*", TextType.ITALIC_TEXT)
+    nodes = split_nodes_delimiter(nodes, "`", TextType.CODE_TEXT)
+
+    # Filter out any empty text nodes
+    nodes = [node for node in nodes if node.text != ""]
+
+    return nodes
+
+def markdown_to_blocks(markdown):
+    blocks = []
+
+    raw_blocks = markdown.split('\n\n')
+
+    for block in raw_blocks:
+        stripped_block = block.strip()
+        if stripped_block:
+            blocks.append(stripped_block)
+
+    return blocks
+
+
 
 class TextType(Enum):
     PLAIN_TEXT = "text"
