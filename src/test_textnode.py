@@ -1,6 +1,6 @@
 import unittest
 
-from textnode import TextNode, TextType, extract_markdown_images, extract_markdown_links, text_to_textnodes, markdown_to_blocks
+from textnode import TextNode, TextType, extract_markdown_images, extract_markdown_links, text_to_textnodes, markdown_to_blocks, block_to_block_type, BlockType
 from splitnodes import split_nodes_delimiter, split_nodes_image, split_nodes_link
 
 class TestTextNode(unittest.TestCase):
@@ -756,3 +756,136 @@ code block
         blocks = markdown_to_blocks(md)
         expected = ["Block1", "Block2", "Block3", "Block4"]
         self.assertEqual(blocks, expected)
+
+    # ===== Block to Block Type Tests =====
+    def test_block_to_block_type_heading_h1(self):
+        # Test heading with single # (h1)
+        block = "# This is an h1 heading"
+        block_type = block_to_block_type(block)
+        self.assertEqual(block_type, BlockType.HEADING)
+
+    def test_block_to_block_type_heading_h6(self):
+        # Test heading with six # characters (h6)
+        block = "###### This is an h6 heading"
+        block_type = block_to_block_type(block)
+        self.assertEqual(block_type, BlockType.HEADING)
+
+    def test_block_to_block_type_heading_with_formatting(self):
+        # Test heading that contains formatting markdown
+        block = "## This is a heading with **bold** text"
+        block_type = block_to_block_type(block)
+        self.assertEqual(block_type, BlockType.HEADING)
+
+    def test_block_to_block_type_invalid_heading_no_space(self):
+        # Test that heading without space after # is treated as paragraph
+        block = "#This is not a heading"
+        block_type = block_to_block_type(block)
+        self.assertEqual(block_type, BlockType.PARAGRAPH)
+
+    def test_block_to_block_type_invalid_heading_too_many_hashes(self):
+        # Test that more than 6 # characters is treated as paragraph
+        block = "####### This has too many hashes"
+        block_type = block_to_block_type(block)
+        self.assertEqual(block_type, BlockType.PARAGRAPH)
+
+    def test_block_to_block_type_code_block(self):
+        # Test code block with backticks
+        block = "```\nprint('hello world')\nreturn 42\n```"
+        block_type = block_to_block_type(block)
+        self.assertEqual(block_type, BlockType.CODE)
+
+    def test_block_to_block_type_code_block_single_line(self):
+        # Test single-line code block
+        block = "```code here```"
+        block_type = block_to_block_type(block)
+        self.assertEqual(block_type, BlockType.CODE)
+
+    def test_block_to_block_type_quote_single_line(self):
+        # Test single-line quote block
+        block = "> This is a quote"
+        block_type = block_to_block_type(block)
+        self.assertEqual(block_type, BlockType.QUOTE)
+
+    def test_block_to_block_type_quote_multi_line(self):
+        # Test multi-line quote block where every line starts with >
+        block = "> This is a quote\n> that spans multiple lines\n> and should be identified correctly"
+        block_type = block_to_block_type(block)
+        self.assertEqual(block_type, BlockType.QUOTE)
+
+    def test_block_to_block_type_invalid_quote(self):
+        # Test that block with some lines not starting with > is paragraph
+        block = "> This is a quote\nThis line breaks the quote\n> Back to quote"
+        block_type = block_to_block_type(block)
+        self.assertEqual(block_type, BlockType.PARAGRAPH)
+
+    def test_block_to_block_type_unordered_list_single_item(self):
+        # Test single-item unordered list
+        block = "- This is a list item"
+        block_type = block_to_block_type(block)
+        self.assertEqual(block_type, BlockType.UNORDERED_LIST)
+
+    def test_block_to_block_type_unordered_list_multiple_items(self):
+        # Test multi-item unordered list
+        block = "- First item\n- Second item\n- Third item"
+        block_type = block_to_block_type(block)
+        self.assertEqual(block_type, BlockType.UNORDERED_LIST)
+
+    def test_block_to_block_type_invalid_unordered_list_no_space(self):
+        # Test that list without space after - is treated as paragraph
+        block = "-Not a list item\n-Another non-list"
+        block_type = block_to_block_type(block)
+        self.assertEqual(block_type, BlockType.PARAGRAPH)
+
+    def test_block_to_block_type_invalid_unordered_list_mixed(self):
+        # Test that block with some lines not starting with "- " is paragraph
+        block = "- This is a list item\nThis breaks the list\n- Back to list"
+        block_type = block_to_block_type(block)
+        self.assertEqual(block_type, BlockType.PARAGRAPH)
+
+    def test_block_to_block_type_ordered_list_single_item(self):
+        # Test single-item ordered list
+        block = "1. First item"
+        block_type = block_to_block_type(block)
+        self.assertEqual(block_type, BlockType.ORDERED_LIST)
+
+    def test_block_to_block_type_ordered_list_multiple_items(self):
+        # Test multi-item ordered list with correct sequential numbering
+        block = "1. First item\n2. Second item\n3. Third item\n4. Fourth item"
+        block_type = block_to_block_type(block)
+        self.assertEqual(block_type, BlockType.ORDERED_LIST)
+
+    def test_block_to_block_type_invalid_ordered_list_wrong_start(self):
+        # Test that ordered list not starting with 1 is treated as paragraph
+        block = "2. Second item\n3. Third item"
+        block_type = block_to_block_type(block)
+        self.assertEqual(block_type, BlockType.PARAGRAPH)
+
+    def test_block_to_block_type_invalid_ordered_list_wrong_sequence(self):
+        # Test that ordered list with incorrect numbering is treated as paragraph
+        block = "1. First item\n3. Third item\n4. Fourth item"
+        block_type = block_to_block_type(block)
+        self.assertEqual(block_type, BlockType.PARAGRAPH)
+
+    def test_block_to_block_type_invalid_ordered_list_no_space(self):
+        # Test that ordered list without space after number is treated as paragraph
+        block = "1.First item\n2.Second item"
+        block_type = block_to_block_type(block)
+        self.assertEqual(block_type, BlockType.PARAGRAPH)
+
+    def test_block_to_block_type_paragraph_simple(self):
+        # Test simple paragraph text
+        block = "This is just a regular paragraph of text."
+        block_type = block_to_block_type(block)
+        self.assertEqual(block_type, BlockType.PARAGRAPH)
+
+    def test_block_to_block_type_paragraph_with_formatting(self):
+        # Test paragraph containing inline formatting
+        block = "This is a paragraph with **bold** and *italic* text."
+        block_type = block_to_block_type(block)
+        self.assertEqual(block_type, BlockType.PARAGRAPH)
+
+    def test_block_to_block_type_paragraph_multiline(self):
+        # Test multi-line paragraph
+        block = "This is a paragraph\nthat spans multiple lines\nbut is still just a paragraph"
+        block_type = block_to_block_type(block)
+        self.assertEqual(block_type, BlockType.PARAGRAPH)
