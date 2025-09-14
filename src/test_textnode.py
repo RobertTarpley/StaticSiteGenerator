@@ -1,6 +1,6 @@
 import unittest
 
-from textnode import TextNode, TextType, extract_markdown_images, extract_markdown_links, text_to_textnodes, markdown_to_blocks, block_to_block_type, BlockType
+from textnode import TextNode, TextType, extract_markdown_images, extract_markdown_links, text_to_textnodes, markdown_to_blocks, block_to_block_type, BlockType, markdown_to_html_node, extract_title
 from splitnodes import split_nodes_delimiter, split_nodes_image, split_nodes_link
 
 class TestTextNode(unittest.TestCase):
@@ -710,11 +710,11 @@ multiple lines"""
 
     def test_markdown_to_blocks_strips_whitespace(self):
         # Test that leading and trailing whitespace is stripped from blocks
-        md = """   
-  First block with spaces   
+        md = """
+  First block with spaces
 
 
-   Second block also with spaces   
+   Second block also with spaces
    """
         blocks = markdown_to_blocks(md)
         expected = [
@@ -743,7 +743,7 @@ code block
         expected = [
             "# This is a heading",
             "This is a paragraph of text.",
-            "## Another heading", 
+            "## Another heading",
             "- List item 1\n- List item 2",
             "```\ncode block\n```",
             "> This is a quote"
@@ -889,3 +889,270 @@ code block
         block = "This is a paragraph\nthat spans multiple lines\nbut is still just a paragraph"
         block_type = block_to_block_type(block)
         self.assertEqual(block_type, BlockType.PARAGRAPH)
+
+
+    def test_paragraphs(self):
+        md = """
+    This is **bolded** paragraph
+    text in a p
+    tag here
+
+    This is another paragraph with _italic_ text and `code` here
+
+    """
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><p>This is <b>bolded</b> paragraph text in a p tag here</p><p>This is another paragraph with <i>italic</i> text and <code>code</code> here</p></div>",
+        )
+
+    def test_codeblock(self):
+        md = """
+    ```
+    This is text that _should_ remain
+    the **same** even with inline stuff
+    ```
+    """
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff\n</code></pre></div>",
+        )
+
+    # ===== Markdown to HTML Node Tests =====
+    def test_markdown_to_html_node_heading_h1(self):
+        # Test h1 heading conversion
+        md = "# This is a heading"
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(html, "<div><h1>This is a heading</h1></div>")
+
+    def test_markdown_to_html_node_heading_with_formatting(self):
+        # Test heading with inline formatting
+        md = "## Heading with **bold** and *italic* text"
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(html, "<div><h2>Heading with <b>bold</b> and <i>italic</i> text</h2></div>")
+
+    def test_markdown_to_html_node_multiple_headings(self):
+        # Test multiple headings of different levels
+        md = """# H1 Heading
+
+## H2 Heading
+
+### H3 Heading"""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(html, "<div><h1>H1 Heading</h1><h2>H2 Heading</h2><h3>H3 Heading</h3></div>")
+
+    def test_markdown_to_html_node_quote_single_line(self):
+        # Test single line quote
+        md = "> This is a quote"
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(html, "<div><blockquote>This is a quote</blockquote></div>")
+
+    def test_markdown_to_html_node_quote_multi_line(self):
+        # Test multi-line quote with formatting
+        md = """> This is a multi-line quote
+> with **bold** text
+> and _italic_ text"""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        expected = "<div><blockquote>This is a multi-line quote\nwith <b>bold</b> text\nand <i>italic</i> text</blockquote></div>"
+        self.assertEqual(html, expected)
+
+    def test_markdown_to_html_node_unordered_list(self):
+        # Test unordered list conversion
+        md = """- First item
+- Second item with **bold**
+- Third item with `code`"""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        expected = "<div><ul><li>First item</li><li>Second item with <b>bold</b></li><li>Third item with <code>code</code></li></ul></div>"
+        self.assertEqual(html, expected)
+
+    def test_markdown_to_html_node_ordered_list(self):
+        # Test ordered list conversion
+        md = """1. First numbered item
+2. Second item with *italic*
+3. Third item with [link](https://example.com)"""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        expected = '<div><ol><li>First numbered item</li><li>Second item with <i>italic</i></li><li>Third item with <a href="https://example.com">link</a></li></ol></div>'
+        self.assertEqual(html, expected)
+
+    def test_markdown_to_html_node_code_block_simple(self):
+        # Test simple code block without indentation
+        md = """```
+print("hello world")
+return 42
+```"""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        expected = '<div><pre><code>print("hello world")\nreturn 42\n</code></pre></div>'
+        self.assertEqual(html, expected)
+
+    def test_markdown_to_html_node_mixed_content(self):
+        # Test document with multiple different block types
+        md = """# Main Title
+
+This is a paragraph with **bold** text.
+
+## Subtitle
+
+Here's a list:
+
+- Item one
+- Item two with `code`
+
+And a quote:
+
+> This is quoted text
+
+Finally some code:
+
+```
+def hello():
+    return "world"
+```"""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        expected = '<div><h1>Main Title</h1><p>This is a paragraph with <b>bold</b> text.</p><h2>Subtitle</h2><p>Here\'s a list:</p><ul><li>Item one</li><li>Item two with <code>code</code></li></ul><p>And a quote:</p><blockquote>This is quoted text</blockquote><p>Finally some code:</p><pre><code>def hello():\n    return "world"\n</code></pre></div>'
+        self.assertEqual(html, expected)
+
+    def test_markdown_to_html_node_paragraph_with_links_and_images(self):
+        # Test paragraph with links and images
+        md = """This paragraph has a [link](https://example.com) and an ![image](https://example.com/img.jpg)."""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        expected = '<div><p>This paragraph has a <a href="https://example.com">link</a> and an <img src="https://example.com/img.jpg" alt="image"></img>.</p></div>'
+        self.assertEqual(html, expected)
+
+    def test_markdown_to_html_node_empty_document(self):
+        # Test empty markdown document
+        md = ""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(html, "<div></div>")
+
+    def test_markdown_to_html_node_whitespace_only(self):
+        # Test document with only whitespace
+        md = "\n\n   \n\n"
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(html, "<div></div>")
+
+    def test_markdown_to_html_node_complex_formatting(self):
+        # Test complex inline formatting combinations
+        md = """This has **bold and _nested italic_** text."""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        # Note: This tests the order of processing (bold first, then italic)
+        expected = "<div><p>This has <b>bold and <i>nested italic</i></b> text.</p></div>"
+        self.assertEqual(html, expected)
+
+    def test_markdown_to_html_node_adjacent_blocks(self):
+        # Test blocks right next to each other without extra spacing
+        md = """# Heading
+Paragraph right after heading.
+- List item
+> Quote block"""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        expected = "<div><h1>Heading</h1><p>Paragraph right after heading.</p><ul><li>List item</li></ul><blockquote>Quote block</blockquote></div>"
+        self.assertEqual(html, expected)
+
+    # ===== Extract Title Tests =====
+    def test_extract_title_basic(self):
+        # Test basic h1 extraction
+        md = "# Hello World"
+        title = extract_title(md)
+        self.assertEqual(title, "Hello World")
+
+    def test_extract_title_with_whitespace(self):
+        # Test h1 with leading/trailing whitespace
+        md = "#   Hello World   "
+        title = extract_title(md)
+        self.assertEqual(title, "Hello World")
+
+    def test_extract_title_multiline(self):
+        # Test h1 in multiline markdown
+        md = """Some text before
+        
+# My Great Title
+
+Some content after"""
+        title = extract_title(md)
+        self.assertEqual(title, "My Great Title")
+
+    def test_extract_title_ignore_h2(self):
+        # Test that h2 headers are ignored, only h1 is extracted
+        md = """## This is h2
+
+# This is h1
+
+### This is h3"""
+        title = extract_title(md)
+        self.assertEqual(title, "This is h1")
+
+    def test_extract_title_first_h1_wins(self):
+        # Test that first h1 is returned when multiple exist
+        md = """# First Title
+
+Some content
+
+# Second Title"""
+        title = extract_title(md)
+        self.assertEqual(title, "First Title")
+
+    def test_extract_title_no_h1_raises_exception(self):
+        # Test exception when no h1 header exists
+        md = """## Only h2 here
+
+Some content
+
+### And h3"""
+        with self.assertRaises(ValueError) as context:
+            extract_title(md)
+        self.assertIn("No h1 header found", str(context.exception))
+
+    def test_extract_title_empty_markdown_raises_exception(self):
+        # Test exception with empty markdown
+        md = ""
+        with self.assertRaises(ValueError):
+            extract_title(md)
+
+    def test_extract_title_hash_without_space_ignored(self):
+        # Test that # without space is not treated as h1
+        md = """#NotAHeader
+
+# Real Header"""
+        title = extract_title(md)
+        self.assertEqual(title, "Real Header")
+
+    def test_extract_title_with_formatting(self):
+        # Test h1 with inline formatting (should preserve the formatting text)
+        md = "# My **Bold** Title with *Italic*"
+        title = extract_title(md)
+        self.assertEqual(title, "My **Bold** Title with *Italic*")
+
+    def test_extract_title_only_whitespace_after_hash(self):
+        # Test h1 that's just "# " with only whitespace
+        md = "#   "
+        title = extract_title(md)
+        self.assertEqual(title, "")
+
+    def test_markdown_to_html_node_nested_quotes(self):
+        # Test quote with multiple > characters (though our parser treats them the same)
+        md = """> Level 1 quote
+> Still level 1
+> With **formatting**"""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        expected = "<div><blockquote>Level 1 quote\nStill level 1\nWith <b>formatting</b></blockquote></div>"
+        self.assertEqual(html, expected)
