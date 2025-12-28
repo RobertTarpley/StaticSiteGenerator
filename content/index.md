@@ -1,46 +1,36 @@
-# Tolkien Fan Club
+# A blog I guess...
 
-![JRR Tolkien sitting](/images/tolkien.png)
+![Under Construction](/images/underconstruction.png)
 
-Here's the deal, **I like Tolkien**.
+## Hello!
 
-> "I am in fact a Hobbit in all but size."
->
-> -- J.R.R. Tolkien
+My name is Bob Tarpley and this is my blog. I'm a self-taught 
 
-## Blog posts
+- **Business Analyst**, *no wait*
 
-- [Why Glorfindel is More Impressive than Legolas](/blog/glorfindel)
-- [Why Tom Bombadil Was a Mistake](/blog/tom)
-- [The Unparalleled Majesty of "The Lord of the Rings"](/blog/majesty)
+- **Business Intelligence Analyst**, *no wait*
 
-## Reasons I like Tolkien
+- **Business Intelligence Developer**, *no wait*
 
-- You can spend years studying the legendarium and still not understand its depths
-- It can be enjoyed by children and adults alike
-- Disney _didn't ruin it_ (okay, but Amazon might have)
-- It created an entirely new genre of fantasy
+- **Aspiring Data Engineer**, *no wait*
 
-## My favorite characters (in order)
+- **Software Engineer** wanna be, *no wait*
 
-1. Gandalf
-2. Bilbo
-3. Sam
-4. Glorfindel
-5. Galadriel
-6. Elrond
-7. Thorin
-8. Sauron
-9. Aragorn
+Maybe we don't put labels on it just yet!
 
-Here's what `elflang` looks like (the perfect coding language):
 
-```
-func main(){
-    fmt.Println("Aiya, Ambar!")
-}
-```
+## Recent Blog Posts
 
-Want to get in touch? [Contact me here](/contact).
+- [Do I have a coffee problem?](/blog/coffee/first-post)
+- [How I never learned python](/blog/programming/first-post)
+- [When is one "fluent" in a programming language?](/blog/programming/second-post)
+
+## Projects
+
+- [Projects](/projects)
+
+## Contact
+
+Want to get in touch? [Click here](/about).
 
 This site was generated with a custom-built [static site generator](https://www.boot.dev/courses/build-static-site-generator-python) from the course on [Boot.dev](https://www.boot.dev).
