@@ -2,10 +2,10 @@
 
 [< Back Home](/)
 
-![Enhanced Bob Profile Picture](/images/profile.jpg)
+![Profile Picture](/images/profile.png)
 
 **Email:** robert.tarpley@gmail.com
 
-**GitHub:** https://github.com/roberttarpley
+**GitHub:** [link to my github repo](https://github.com/roberttarpley)
 
-**LinkedIn:** https://www.linkedin.com/in/robert-tarpley/
+**LinkedIn:** [link to myLinkedIn](https://www.linkedin.com/in/robert-tarpley/)

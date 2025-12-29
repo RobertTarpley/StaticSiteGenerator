@@ -1,10 +1,10 @@
-# A blog I guess...
+# Hello, World! 
 
-![Under Construction](/images/underconstruction.png)
+![Mountain and River view](/images/landingbanner.png)
 
-## Hello!
+## And welcome, my name is Bob and this is my blog/portfolio site. 
 
-My name is Bob Tarpley and this is my blog. I'm a self-taught 
+I'm a self-taught 
 
 - **Business Analyst**, *no wait*
 
@@ -14,10 +14,13 @@ My name is Bob Tarpley and this is my blog. I'm a self-taught
 
 - **Aspiring Data Engineer**, *no wait*
 
-- **Software Engineer** wanna be, *no wait*
+Ugh, maybe we don't put labels on it. 
 
-Maybe we don't put labels on it just yet!
+Simply put I have a few competing interests and need somewhere to showcase it (so I'm told).
 
+## Projects
+
+- [This Website!](/projects/ssg)
 
 ## Recent Blog Posts
 
@@ -25,12 +28,6 @@ Maybe we don't put labels on it just yet!
 - [How I never learned python](/blog/programming/first-post)
 - [When is one "fluent" in a programming language?](/blog/programming/second-post)
 
-## Projects
-
-- [Projects](/projects)
-
 ## Contact
 
 Want to get in touch? [Click here](/about).
-
-This site was generated with a custom-built [static site generator](https://www.boot.dev/courses/build-static-site-generator-python) from the course on [Boot.dev](https://www.boot.dev).
