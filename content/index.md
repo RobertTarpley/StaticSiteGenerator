@@ -21,12 +21,13 @@ Simply put I have a few competing interests and need somewhere to showcase it (s
 ## Projects
 
 - [This Website!](/projects/ssg)
+- [SQL Formatter](https://roberttarpley.github.io/sqlFormatter/)
 
-## Recent Blog Posts
+<!--## Recent Blog Posts-->
 
-- [Do I have a coffee problem?](/blog/coffee/first-post)
+<!--- [Do I have a coffee problem?](/blog/coffee/first-post)
 - [How I never learned python](/blog/programming/first-post)
-- [When is one "fluent" in a programming language?](/blog/programming/second-post)
+- [When is one "fluent" in a programming language?](/blog/programming/second-post)-->
 
 ## Contact
 

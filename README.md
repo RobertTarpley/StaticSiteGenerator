@@ -320,27 +320,3 @@ grep -L "^# " content/**/*.md              # Check for missing h1 headers
 | CSS not loading | Check `template.html` has `<link href="/index.css">` |
 
 ---
-
-## Summary
-
-**What You Have:**
-- Clean, minimal static site generator
-- Markdown → HTML conversion with template system
-- Static asset handling and local development server
-
-**What It Supports:**
-- Headings, paragraphs, bold, italic, code, code blocks
-- Links (internal and external), images
-- Blockquotes, ordered/unordered lists, raw HTML
-
-**What It Doesn't Support:**
-- Nested lists, tables (without HTML), task lists
-- Strikethrough, footnotes, syntax highlighting
-- Automatic blog indexes, RSS, search
-
-**Deployment Ready:**
-- GitHub Pages compatible
-- Basepath support for subdirectories
-- Clean URLs with `/index.html` pattern
-
-This is a solid foundation for a personal portfolio site. Start with basic content and styling, then add advanced features as needed!

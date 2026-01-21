@@ -6,6 +6,6 @@
 
 **Email:** robert.tarpley@gmail.com
 
-**GitHub:** [link to my github repo](https://github.com/roberttarpley)
+**GitHub:** [Repo Link](https://github.com/roberttarpley)
 
-**LinkedIn:** [link to myLinkedIn](https://www.linkedin.com/in/robert-tarpley/)
+**LinkedIn:** [link](https://www.linkedin.com/in/robert-tarpley/)
