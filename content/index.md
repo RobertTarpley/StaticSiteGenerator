@@ -22,6 +22,7 @@ Simply put I have a few competing interests and need somewhere to showcase it (s
 
 - [This Website!](/projects/ssg)
 - [SQL Formatter](https://roberttarpley.github.io/sqlFormatter/)
+- [Diff Checker](https://roberttarpley.github.io/whatTheDiff/)
 
 <!--## Recent Blog Posts-->
 
